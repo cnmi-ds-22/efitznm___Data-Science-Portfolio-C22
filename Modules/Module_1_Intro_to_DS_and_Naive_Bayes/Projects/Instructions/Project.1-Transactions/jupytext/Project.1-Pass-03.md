@@ -1,7 +1,7 @@
 <a href="https://colab.research.google.com/github/efitznm/Data-Science-Portfolio-C22/blob/main/Modules/Module_1_Intro_to_DS_and_Naive_Bayes/Projects/Instructions/Project.1-Transactions/Project.1-Pass-03.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 
-# Project.1_Pass-02, Transaction Data
+# Project.1_Pass-03, Transaction Data
 
 
 
@@ -172,10 +172,12 @@ df = df_bak_2.copy()
 ### Normal Distribution of Features: Histogram & Box Plot
 
 ```python
+# Display a histogram
 df.hist() ;
 ```
 
 ```python
+# Display a box and whisker plot
 df.plot(kind='box') ;
 ```
 
@@ -234,10 +236,12 @@ features = df.drop(columns=[target_col])
 ```
 
 ```python
+# Verify the target
 target
 ```
 
 ```python
+# Verify the features
 features
 ```
 
@@ -322,10 +326,14 @@ print(metrics.classification_report(y_test, pred_results))
 ### Data Visualization
 
 ```python
+# Disply a histogram of the results
 pd.Series(pred_results).hist() ;
 ```
 
-### Conclusion
+## Conclusion
+
+
+### Communication of Results
 
 
 - var_0 thru var_16 gave us 91% accuracy, increase from 90% in Pass-02
@@ -337,7 +345,10 @@ pd.Series(pred_results).hist() ;
 
 ### Future work
 
+```python
+
+```
 
 
-- For Pass-03, use all columns and rows
+- For Pass-04, use all columns and rows
 - Balance the dataset (way more unsuccessful transactions vs. successful transactions)

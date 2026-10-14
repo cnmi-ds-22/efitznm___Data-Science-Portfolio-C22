@@ -344,7 +344,6 @@ results
 ```
 
 ### Accuracy Comparison
-Accuracies are both 91% for single and multi CVs
 
 ```python
 # Compare the accuracies by creating variables for each
@@ -359,8 +358,7 @@ display('Multi CV:', acc_multi_cv)
 
 The training data is very skewed towards non-successful transactions (about 90% of the training data has ‘target’==0).
 
-
-#### Remove enough non-successful transaction rows so that your remaining training data is 50%/50% split between successful and non-successful transactions.
+Remove enough non-successful transaction rows so that your remaining training data is 50%/50% split between successful and non-successful transactions.
 
 ```python
 # Display value counts of the target
@@ -482,6 +480,7 @@ There is a negative skew.
 #### Confusion Matrix and Heatmap
 
 ```python
+# Display a confusion matrix and heatmap
 mat =  metrics.confusion_matrix(
     y_test,
     pred_results
@@ -500,6 +499,7 @@ plt.ylabel('Predicted');
 #### Classification Report
 
 ```python
+# Display a classification report
 print(metrics.classification_report(y_test, pred_results))
 ```
 
