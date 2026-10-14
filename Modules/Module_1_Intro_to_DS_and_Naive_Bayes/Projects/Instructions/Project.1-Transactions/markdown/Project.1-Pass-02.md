@@ -2318,6 +2318,7 @@ df = df_bak_2.copy()
 
 
 ```python
+# Display a histogram
 df.hist() ;
 ```
 
@@ -2329,6 +2330,7 @@ df.hist() ;
 
 
 ```python
+# Display a box and whisker plot
 df.plot(kind='box') ;
 ```
 
@@ -2975,6 +2977,7 @@ features = df.drop(columns=[target_col])
 
 
 ```python
+# Verify the target
 target
 ```
 
@@ -3056,6 +3059,7 @@ target
 
 
 ```python
+# Verify the features
 features
 ```
 
@@ -4041,6 +4045,7 @@ print(metrics.classification_report(y_test, pred_results))
 
 
 ```python
+# Display a histogram of the results
 pd.Series(pred_results).hist() ;
 ```
 
@@ -4050,7 +4055,9 @@ pd.Series(pred_results).hist() ;
     
 
 
-### Conclusion
+## Conclusion
+
+### Communication of Results
 
 - var_0 thru var_16 gave us 90% accuracy
 - Bad at predicting no-transactions

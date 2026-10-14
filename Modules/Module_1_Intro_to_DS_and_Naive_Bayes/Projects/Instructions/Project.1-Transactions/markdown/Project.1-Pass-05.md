@@ -2342,7 +2342,7 @@ df = df_bak.copy()
 
 
 ```python
-# Select the target and features
+# Select the target and features (range of var_0 thru var_49)
 df = df[['target'] + [f'var_{i}' for i in range(50)]]
 df
 ```
@@ -2824,6 +2824,7 @@ df = df_bak_2.copy()
 
 
 ```python
+# Display a histogram
 df.hist() ;
 ```
 
@@ -2835,6 +2836,7 @@ df.hist() ;
 
 
 ```python
+# Display a box and whisker plot
 df.plot(kind='box') ;
 ```
 
@@ -4331,6 +4333,7 @@ features = df.drop(columns=[target_col])
 
 
 ```python
+#Verify the target
 target
 ```
 
@@ -4412,6 +4415,7 @@ target
 
 
 ```python
+# Verify the features
 features
 ```
 
@@ -5471,10 +5475,10 @@ results
 
 
 ### Accuracy Comparison
-Accuracies are both 91% for single and multi CVs
 
 
 ```python
+# Compare the accuracies by creating variables for each
 acc_single_cv = acc
 acc_multi_cv = results[i]
 
@@ -5505,6 +5509,7 @@ display('Multi CV:', acc_multi_cv)
 
 
 ```python
+# Display a histogram of the results
 pd.Series(results).hist() ;
 ```
 

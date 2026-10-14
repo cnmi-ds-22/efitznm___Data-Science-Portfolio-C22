@@ -177,9 +177,8 @@ df
 
 #### Target Column with Null Counts
 
-Remove rows with unknown target values
-
 ```python
+# Remove rows with unknown target values
 df = df.dropna(subset=['target'])
 ```
 
@@ -212,6 +211,8 @@ df.isnull().sum().sort_values(ascending=False)
 Consider some row removal or imputation
 
 ```python
+# See if imputation needed for any low null counts in feature columns
+# Null counts all at zero now, so no imputation needed
 df.isnull().sum()
 ```
 
@@ -239,11 +240,27 @@ df = df_bak_2.copy()
 
 ```python
 # Select the target and features
-df = df[['target'] + [f'var_{i}' for i in range(9)]]
+target_col = 'target'
+target = df[ target_col]
+features = df.drop(columns=[target_col])
+```
+
+```python
+# Verify dataframe is the same
 df
 ```
 
-Backup #3
+```python
+# Verify the target
+target
+```
+
+```python
+# Verify the features
+features
+```
+
+### Backup #3
 
 ```python
 # Make a backup
@@ -275,9 +292,7 @@ df.plot(kind='box') ;
 
 ```python
 # Calculate a correlation matrix
-iso_features = df[['target'] + [f'var_{i}' for i in range(9)]]
-
-corr_mat = iso_features.corr()
+corr_mat = features.corr()
 
 corr_mat
 ```
@@ -315,25 +330,6 @@ unsuccessful_df = df[df['target'] == 0].copy()
 
 ### Single Cross Validation ( CV )
 
-
-#### Two data sets with target and features
-
-```python
-# Split data frame into target and features
-target_col = 'target'
-target = df[ target_col]
-features = df.drop(columns=[target_col])
-```
-
-```python
-# Display the target
-target
-```
-
-```python
-# Display the features
-features
-```
 
 #### Define an empty Gaussian Naïve Bayes model using Sklearn
 
@@ -409,222 +405,22 @@ plt.ylabel('Predicted');
 print(metrics.classification_report(y_test, pred_results))
 ```
 
-### Multiple Cross-Validation (CV)
-
-```python
-# Multiple CV loop
-n = 100
-results = np.zeros(n)
-
-for i in range(n):
-   X_train, X_test, y_train, y_test = train_test_split(
-        features, target, test_size=0.25, random_state=None
-)
-
-# Create an empty GNB model
-modelGNB = GaussianNB()
-
-# Train ( fit ) the model
-modelGNB.fit( (X_train), y_train)
-
-# Make predicitons using the model
-pred_results = modelGNB.predict(X_test)
-
-# calculate the accuracy
-results[i] = metrics.accuracy_score(y_test, pred_results)
-
-results
-```
-
-### Accuracy Comparison
-Accuracies are both 91% for single and multi CVs
-
-```python
-# Compare the accuracies by creating variables for each
-acc_single_cv = acc
-acc_multi_cv = results[i]
-
-display('Single CV:', acc_single_cv)
-display('Multi CV:', acc_multi_cv)
-```
-
-### Balance Dataset
-
-The training data is very skewed towards non-successful transactions (about 90% of the training data has ‘target’==0).
-
-
-#### Remove enough non-successful transaction rows so that your remaining training data is 50%/50% split between successful and non-successful transactions.
-
-```python
-# Display value counts of the target
-df['target'].value_counts()
-```
-
-```python
-# Place minority class in one dataframe
-successful_df
-```
-
-```python
-# Put majority class into its own dataframe
-unsuccessful_df
-```
-
-```python
-# Create downsample of majority class in another data frame
-majority_downsampled = unsuccessful_df.sample(
-    n=len(successful_df),
-    random_state=42
-)
-
-# Display the downsample to verify
-print("Minority class:")
-print(successful_df['target'].value_counts())
-
-print("Downsampled majority class:")
-print(majority_downsampled['target'].value_counts())
-```
-
-```python
-# Combine the dataframes
-balanced_df = pd.concat([successful_df, majority_downsampled])
-
-# Reset the index
-balanced_df = balanced_df.reset_index(drop=True)
-```
-
-```python
-# Verify target counts
-balanced_df['target'].value_counts()
-```
-
-#### Backup #3
-
-```python
-# Create 3rd backup
-df_bak_3 = df.copy()
-```
-
-```python
-# Restore from backup
-df = df_bak_3.copy()
-```
-
-#### Repeat Multi Cross-Validation
-
-```python
-# Split data frame into target and features
-target_col = 'target'
-target = balanced_df[ target_col]
-features = balanced_df.drop(columns=[target_col])
-```
-
-```python
-# Display the target
-target
-```
-
-```python
-# Display the features
-features
-```
-
-```python
-# Multiple CV loop
-n = 100
-balanced_df_results = np.zeros(n)
-
-for i in range(n):
-    X_train, X_test, y_train, y_test = train_test_split(
-        features, target, test_size=0.25, random_state=None
-    )
-
-   # Create an empty GNB model
-    modelGNB = GaussianNB()
-
-    # Train ( fit ) the model
-    modelGNB.fit( (X_train), y_train)
-
-    # Make predicitons using the model
-    pred_results = modelGNB.predict(X_test)
-
-    # calculate the accuracy
-    balanced_df_results[i] = metrics.accuracy_score(y_test, pred_results)
-
-balanced_df_results
-```
-
-#### Mean accuracy for balanced dataset
-
-```python
-# Report what your mean accuracy for this balanced data set
-display(balanced_df_results[i])
-```
-
-#### Histogram of the accuracy scores
-
-```python
-pd.Series(balanced_df_results).hist() ;
-```
-
-What do you notice about the distribution of accuracy scores?
-
-There is a negative skew.
-
-
-#### Confusion Matrix and Heatmap
-
-```python
-mat =  metrics.confusion_matrix(
-    y_test,
-    pred_results
-)
-
-sns.heatmap( mat.T,
-    square=True,
-    annot=True,
-    fmt = "2f",
-    cbar = False,
-)
-plt.xlabel('Actual')
-plt.ylabel('Predicted');
-```
-
-#### Classification Report
-
-```python
-print(metrics.classification_report(y_test, pred_results))
-```
-
-What do you notice? That is, how do the different metrics compare to each other?
-
-
-## Data Visualization/Communication of Results
-
-
-
-### Data Visualization
-
-```python
-# Display a histagram of the results
-pd.Series(balanced_df_results).hist() ;
-```
-
 ### Conclusion
 
 
-- Using all var columns and balancing the dataset gave us 91% accuracy, same as with previous Pass-05
-- Bad at predicting no-transactions
-- OK at predicting a successful transaction
-- Low false positive (we predict customer will make a transaction but customer does not)
-- High false negative (we predict customer will not make a transaction but customer does)
+- In Pass-07, using the big data set, only first 15 columns, only first 10,000 rows (balancing):
+- Accuracy came out to 89% (down from previous pass)
+- Not great at predicting no-transactions
+- Excellent at predicting a successful transaction
+- Low (zero) false positive (we predict customer will make a transaction but customer does not)
+- Medium false negatives (we predict customer will not make a transaction but customer does)
 
 
 ### Future work
 
 
 
-- For Pass-07,
+- For Pass-08,
   - Use big dataset
-  - Use only the first 15 columns
-  - Use ony the first 10,000 rows
+  - Use only the first 50 columns
+  - Use ony the first 50,000 rows

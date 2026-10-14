@@ -170,10 +170,12 @@ df = df_bak_2.copy()
 ### Normal Distribution of Features: Histogram & Box Plot
 
 ```python
+# Display a histogram
 df.hist() ;
 ```
 
 ```python
+# Display a box and whisker plot
 df.plot(kind='box')
 ```
 
@@ -232,10 +234,12 @@ features = df.drop(columns=[target_col])
 ```
 
 ```python
+# Verify the target
 target
 ```
 
 ```python
+# Verify the features
 features
 ```
 
@@ -320,10 +324,14 @@ print(metrics.classification_report(y_test, pred_results))
 ### Data Visualization
 
 ```python
+# Display a histogram of the results
 pd.Series(pred_results).hist() ;
 ```
 
-### Conclusion
+## Conclusion
+
+
+### Communication of Results
 
 
 - var_0 and var_1 gave us 88% accuracy

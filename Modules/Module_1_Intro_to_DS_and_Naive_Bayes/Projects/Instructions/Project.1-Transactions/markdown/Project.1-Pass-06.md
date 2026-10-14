@@ -4290,16 +4290,19 @@ plt.xlabel('Features')
 ```
 
 
+    ---------------------------------------------------------------------------
+
+    NameError                                 Traceback (most recent call last)
+
+    /tmp/ipykernel_952/160300625.py in <cell line: 0>()
+          1 # Heatmap of the correlation matrix
+    ----> 2 sns.heatmap(
+          3     corr_mat,
+          4     square=True,
+          5     annot=True,
 
 
-    Text(0.5, 23.52222222222222, 'Features')
-
-
-
-
-    
-![png](Project.1-Pass-06_files/Project.1-Pass-06_44_1.png)
-    
+    NameError: name 'sns' is not defined
 
 
 ### Create Two Dataframes (Copies, Not Slices)
@@ -5475,7 +5478,6 @@ results
 
 
 ### Accuracy Comparison
-Accuracies are both 91% for single and multi CVs
 
 
 ```python
@@ -5507,7 +5509,7 @@ display('Multi CV:', acc_multi_cv)
 
 The training data is very skewed towards non-successful transactions (about 90% of the training data has ‘target’==0).
 
-#### Remove enough non-successful transaction rows so that your remaining training data is 50%/50% split between successful and non-successful transactions.
+Remove enough non-successful transaction rows so that your remaining training data is 50%/50% split between successful and non-successful transactions.
 
 
 ```python
@@ -7207,7 +7209,7 @@ pd.Series(balanced_df_results).hist() ;
 
 
     
-![png](Project.1-Pass-06_files/Project.1-Pass-06_91_0.png)
+![png](Project.1-Pass-06_files/Project.1-Pass-06_90_0.png)
     
 
 
@@ -7219,6 +7221,7 @@ There is a negative skew.
 
 
 ```python
+# Display a confusion matrix and heatmap
 mat =  metrics.confusion_matrix(
     y_test,
     pred_results
@@ -7236,7 +7239,7 @@ plt.ylabel('Predicted');
 
 
     
-![png](Project.1-Pass-06_files/Project.1-Pass-06_94_0.png)
+![png](Project.1-Pass-06_files/Project.1-Pass-06_93_0.png)
     
 
 
@@ -7244,6 +7247,7 @@ plt.ylabel('Predicted');
 
 
 ```python
+# Display a classification report
 print(metrics.classification_report(y_test, pred_results))
 ```
 
@@ -7273,7 +7277,7 @@ pd.Series(balanced_df_results).hist() ;
 
 
     
-![png](Project.1-Pass-06_files/Project.1-Pass-06_100_0.png)
+![png](Project.1-Pass-06_files/Project.1-Pass-06_99_0.png)
     
 
 
