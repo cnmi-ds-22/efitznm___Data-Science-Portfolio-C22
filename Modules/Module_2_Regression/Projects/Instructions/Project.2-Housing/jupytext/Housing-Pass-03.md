@@ -1,0 +1,368 @@
+<a href="https://colab.research.google.com/github/efitznm/Data-Science-Portfolio-C22/blob/main/Modules/Module_2_Regression/Projects/Instructions/Project.2-Housing/Housing-Pass-03.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
+
+# Project 2 - Pass 03: Housing Price Prediction
+
+
+
+The project should be done using Regression prediction techniques ( with feature scaling and regularization ) as covered in class.
+The goal is to minimize the RMS ***percentage*** error ( root mean squared percentage error - RMSPE ) on your prediction of the house sales price.
+
+
+
+
+Any of the available features can be used in the regression, but a minimum set of variables that do the job should be the ultimate goal.
+
+
+
+
+Be sure to go through the whole data science process and document as such in your Jupyter notebook.
+
+
+
+
+This project will have less direct "To Do" guidance and the progression through the data science process will be more individualized this time around.  We will talk about all the issues during class so you're not going to be out on a ledge with this one, I just want to move you towards performing a data science project on your own eventually.
+
+
+There are two parts to this data set, both of which are on AWS:
+
+- [Housing Data Dictionary]( https://ddc-datascience.s3.amazonaws.com/Projects/Project.2-Housing/Housing%20-%20Data%20Documentation.pdf )
+- [Data Set]( https://ddc-datascience.s3.amazonaws.com/Projects/Project.2-Housing/Data/Housing.Data.csv)
+
+
+```python
+! curl -s -I https://ddc-datascience.s3.amazonaws.com/Projects/Project.2-Housing/Data/Housing.Data.csv
+```
+
+```python
+! curl -s https://ddc-datascience.s3.amazonaws.com/Projects/Project.2-Housing/Data/Housing.Data.csv | head -2
+```
+## Problem Definition
+
+
+### Business Problem
+
+Target is *Sales Price* and feature is *Lot Frontage*
+
+Help investors evaluate whether lot frontage might be a useful factor when assessing a property's potential market value.
+
+
+### Data Science Problem
+
+Supervised regression
+
+
+## Data Collection/Sources
+
+
+### Load Modules
+
+```python
+# Import the libraries and modules
+from IPython.display import Image
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import seaborn as sns
+
+from sklearn import datasets, metrics, model_selection
+from sklearn import model_selection
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+```
+
+### Load Data
+
+```python
+# Define the data's url as 'url'
+url = 'https://ddc-datascience.s3.amazonaws.com/Projects/Project.2-Housing/Data/Housing.Data.csv'    # insert url here
+url
+```
+
+```python
+# Define the data frame as 'df'
+df = pd.read_csv(url)
+```
+
+## Data Cleaning
+
+
+### Overview
+
+```python
+# Display the head - 81 columns
+df.head()
+```
+
+```python
+# Display the tail - target is the last row
+df.tail()
+```
+
+```python
+# See the shape - 2637 rows, 81 columns
+df.shape
+```
+
+```python
+# See how many total entries
+df.size
+```
+
+### Summary Statistics
+
+Summary statistics give you a quick overview of the data.  Some items to spot check:
+- the Target:
+  - look for nulls
+    - null will be culled
+  - look at min, max, median, and mean
+    - is it a categorical field masquerading as a number?
+- the Features:
+  - numerical
+    - look at min, max, median, and mean
+      - a min=1 and max=count suggests an ID
+  - categorical
+    - look at unique and freq
+      - freq=1, unique=count suggests an ID
+      - freq=count suggests a meaningless feature
+
+```python
+# Summary meta-data - our target 'SalePrice' is int64, our feature 'Lot Frontage' is float64
+df.info()
+```
+
+```python
+# See the summary statistics
+df.describe().transpose()
+```
+
+### Target Nulls
+
+
+
+The target should be the first field that you look at.  Its data type will tell you what kind of machine learning problem this is ( classification or regression. ) Any nulls should be culled.  You can check for any skew in the data set.
+
+```python
+# Define the name of the target column 'SalePrice' to work with it independently
+target_col = 'SalePrice'
+df[target_col]
+```
+
+```python
+# Look for nulls in the target 'SalePrice' (dropping rows if 20% nulls or under) - no nulls in the target
+df[target_col].isnull().sum() / df[target_col].shape[0] * 100
+
+```
+
+
+### Feature Nulls
+
+```python
+# Define the name of the feature columns to work with them independently (all floats are features)
+feature_cols = df.select_dtypes(include=['float']).columns
+df[feature_cols]
+```
+
+```python
+# Look for nulls in the features (dropping rows if 20% nulls or under) - 17% is the highest proportion of nulls in 'Lot Frontage'
+(df[feature_cols].isnull().sum() / df[feature_cols].shape[0] * 100).sort_values(ascending=False)
+```
+
+### Identifier Columns
+
+```python
+# See proportion of unique values in the target column
+(df[target_col].nunique() / df[target_col].shape[0] * 100) #.sort_values(ascending=False)
+```
+
+```python
+# See proportion of unique values in the feature columns
+(df[feature_cols].nunique() / df[feature_cols].shape[0] * 100).sort_values(ascending=False)
+```
+
+```python
+# See for all data - PID is an identifier column
+(df.nunique() / df.shape[0] * 100).sort_values(ascending=False)
+```
+
+```python
+# See the data types of the features - continuous are good for linear regression
+df[feature_cols].dtypes
+```
+
+```python
+# See the data types of the target - continuous are good for linear regression
+df[target_col].dtypes
+```
+
+### Backup #1
+
+```python
+# Make a backup
+df_bak1 = df.copy()
+```
+
+```python
+# Restore from backup
+df = df_bak1.copy()
+```
+
+### Cull the Nulls
+
+- If the number of nulls in a column is low, it would be easiest to drop the row.
+- If the number of nulls in a column is high, it would be easiest to drop the column.
+- If the number of nulls in a column is between the low and high, one should impute values for the nulls.
+
+Feature column containing 17% nulls, so drop those rows in our dataset.
+
+```python
+# Drop null rows referencing the feature columns
+df = df.dropna(subset=feature_cols)
+```
+
+```python
+# Verify rows dropped
+df.shape
+```
+
+### Backup #2
+
+```python
+# Make a backup
+df_bak2 = df.copy()
+```
+
+```python
+# Restore from backup
+df = df_bak2.copy()
+```
+
+### Working Data Frame
+
+```python
+# Define our target and feature columns as a data frame to work with 'iso_df'
+iso_df = pd.concat([df[[target_col]], df[feature_cols]], axis=1).reset_index(drop=True)
+```
+
+```python
+# Verify the working data frame
+iso_df
+```
+
+## EDA (Exploratory Data Analysis)
+
+
+### Linear Regression Check
+
+Linear Regression has two requirements:
+1. the features are correlated with the target
+1. the features are not correlated with each other
+
+
+#### Correlation with Target
+
+```python
+# Calculate a correlation matrix for the target
+corr_mat = iso_df.corr()
+corr_mat
+```
+
+##### Correlation Matrix
+
+```python
+# Display the correlation matrix - check if features correlated with the target
+sns.heatmap(
+    corr_mat,
+    square=True,
+    annot=False,
+    fmt='d',
+    cbar=True,
+    cmap='coolwarm',
+    vmin=-1,vmax=1
+)
+
+plt.title('Correlation of Target and Features');
+```
+
+Couple features have low correlation with the target. Most have a high correlation of 0.5 or higher. Some of these features do have a high correlation with each other. They are not the best features to go with this target for our linear regression model.
+
+
+##### Correlation Ranking
+
+```python
+corr_mat = iso_df.corr().round(2).unstack().abs()
+corr_mat.reset_index()
+```
+
+```python
+# Create a data series with features ranked by correlation
+corr_mat = corr_mat[corr_mat < 1]
+corr_mat.reset_index()
+```
+
+```python
+corr_mat.sort_values(ascending = False)[::2].reset_index()
+```
+
+#### Independence of Features
+Doesn't make sense for a single feature.
+
+
+##### Correlation Matrix
+
+```python
+# Make a correlation matrix of only features
+corr_feat = iso_df.drop(columns=target_col).corr()
+```
+
+```python
+# Display the correlation matrix of only features
+sns.heatmap(
+    corr_feat,
+    square=True,
+    annot=False,
+    fmt='d',
+    cbar=True,
+    cmap='coolwarm',
+    vmin=-1,vmax=1
+)
+
+plt.title('Correlation Between Features');
+```
+
+##### Correlation Ranking
+
+```python
+# Calculate a correlation matrix for the features
+corr_feat2 = iso_df.drop(columns=target_col).corr().round(2).unstack().abs()
+corr_feat2.reset_index()
+```
+
+```python
+# Create a data series with features ranked by correlation
+corr_feat2 = corr_feat2[corr_feat2 < 1]
+corr_feat2.reset_index()
+```
+
+```python
+corr_feat2.sort_values(ascending = False)[::2].reset_index()
+
+```
+
+What do we notice?
+
+
+*   Many predictors are highly correlated to each other
+*   Many predictors are highly correlated with Garage Area
+
+
+
+
+## Data Processing
+
+
+## Data Visualization
+
+
+## Communication of Results
